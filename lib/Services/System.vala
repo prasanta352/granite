@@ -140,43 +140,6 @@ namespace Granite.Services {
         }
 
         static void internal_launch (File? app, GLib.List<File> files) {
-            if (app == null && files.length () == 0)
-                return;
-
-            AppInfo info;
-            if (app != null)
-                info = new DesktopAppInfo.from_filename (app.get_path ());
-            else
-                try {
-                    info = files.first ().data.query_default_handler ();
-                } catch {
-                    return;
-                }
-
-            try {
-                if (files.length () == 0) {
-                    info.launch (null, null);
-                    return;
-                }
-
-                if (info.supports_files ()) {
-                    info.launch (files, null);
-                    return;
-                }
-
-                if (info.supports_uris ()) {
-                    var uris = new GLib.List<string> ();
-                    foreach (var f in files)
-                        uris.append (f.get_uri ());
-                    info.launch_uris (uris, new AppLaunchContext ());
-                    return;
-                }
-
-                error ("Error opening files. The application doesn't support files/URIs or wasn't found.");
-            } catch (Error e) {
-                debug ("Error: " + e.domain.to_string ());
-                error (e.message);
-            }
         }
 
         private static GLib.SettingsSchema? privacy_settings_schema = null;
